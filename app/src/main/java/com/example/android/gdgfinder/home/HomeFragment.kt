@@ -24,6 +24,9 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.android.gdgfinder.databinding.HomeFragmentBinding
+import androidx.navigation.fragment.findNavController
+import androidx.lifecycle.Observer
+import com.example.android.gdgfinder.R
 
 class HomeFragment : Fragment() {
 
@@ -32,13 +35,27 @@ class HomeFragment : Fragment() {
     }
 
     private lateinit var viewModel: HomeViewModel
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+
+
         val binding = HomeFragmentBinding.inflate(inflater)
         viewModel = ViewModelProvider(this).get(HomeViewModel::class.java)
+
+        // Set the viewModel in the binding
+        binding.viewModel = viewModel
+
+        // Observe the navigateToSearch LiveData
+        viewModel.navigateToSearch.observe(viewLifecycleOwner,
+            Observer { navigate ->
+                if (navigate) {
+                    val navController = findNavController()
+                    navController.navigate(R.id.action_homeFragment_to_gdgListFragment)
+                    viewModel.onNavigatedToSearch()
+                }
+            })
 
         return binding.root
     }
